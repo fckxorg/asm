@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/maxim/CLionProjects/asm/compiler/main.cpp
+cstring
+-
+stdio.h
+-
+stdlib.h
+-
+string_funcs.h
+/home/maxim/CLionProjects/asm/compiler/string_funcs.h
+assert.h
+-
+reference.h
+/home/maxim/CLionProjects/asm/compiler/reference.h
+
+/home/maxim/CLionProjects/asm/compiler/reference.h
+
+/home/maxim/CLionProjects/asm/compiler/string_funcs.h
+
