@@ -5,69 +5,20 @@
 #include <assert.h>
 #include "reference.h"
 
-//#pragma pack 1 - упаковка с точностью до одного байта
-
-
-struct WordBoundaries {
-    char *start;
-    char *end;
-};
-
-bool CheckArgs (char *input_file, char *output_file, char *reference_file)
+void writeBinary (const char *binary, const char *filename, size_t amount_of_commands)
 {
-  if (!input_file)
-    {
-      printf ("Input file was not provided.");
-      return false;
-    }
-  if (!output_file)
-    {
-      printf ("Output file was not provided.");
-      return false;
-    }
-  if (!reference_file)
-    {
-      printf ("Reference file was not provided.");
-      return false;
-    }
-  return true;
+  FILE *file = fopen (filename, "wb");
+  fwrite (binary, sizeof (char), amount_of_commands * 4, file);
+  fclose (file);
 }
 
-void getWordsBoundaries (char *buffer, int buffer_size, WordBoundaries *index)
+size_t getAmountOfCommands (char *raw_buffer)
 {
-  /*!Writes list of pointers to string starts
-   * @param file_data array with file_data
-   * @param file_size length of file in symbols
-   * @param string_starts array for pointers storing
-   * */
-  assert (buffer);
-  assert (index);
-
-  (*index).start = buffer;
-
-  for (int i = 1; i < buffer_size; i++)
-    {
-      if (buffer[i - 1] == ' ' || buffer[i - 1] == '\n' || buffer[i - 1] == '\0')
-        {
-          buffer[i - 1] = '\0';
-          (*index).end = &buffer[i - 2];
-          index++;
-          (*index).start = &buffer[i];
-        }
-    }
-
-  buffer[buffer_size - 1] = '\0';
-  (*index).end = &buffer[buffer_size - 2];
-}
-
-int getSizeOfBinary (char *raw_buffer)
-{
-  int count = 0;
+  size_t count = 0;
   while (*raw_buffer)
     {
-      if (*raw_buffer == ' ' || *raw_buffer == '\n' || *raw_buffer == '\0')
+      if (*raw_buffer == '\n')
         {
-          *raw_buffer = '\0';
           count++;
         }
       raw_buffer++;
@@ -75,31 +26,36 @@ int getSizeOfBinary (char *raw_buffer)
   return count;
 }
 
-int *createBinary (WordBoundaries *words, int binary_size)
+char *createBinary (FILE *file, size_t amount_of_commands)
 {
-  int *array = (int *) calloc (binary_size, sizeof (int));
-  int *array_copy = array;
+  char *array = (char *) calloc (amount_of_commands * 32, sizeof (char));
+  char *array_copy = array;
+  char str[5] = "";
 
-  for (int i = 0; i < binary_size; i++)
+  for (int i = 0; i < amount_of_commands; i++)
     {
-      for (int j = 0; j < N_COMMANDS; j++)
-        {
-          if (strcmp (words[i].start, COMMANDS[j]) == 0)
-            {
-              *array = j;
-              if (j < 2)
-                {
-                  array++;
-                  *array = atoi (words[i+1].start);
-                }
-                break;
-            }
-        }
-      i++;
-      array++;
-    }
-  return array_copy;
+      fscanf (file, "%s", str);
 
+#define DEF_CMD(name, num, bytes)\
+        if (strcmp (str, #name) == 0)\
+          {\
+            sprintf (array, "%c", CMD_##name);\
+            int value = 0;\
+            array++;\
+            for (int arg = 0; arg < (bytes - 1) / 4; arg++)\
+            {\
+              fscanf (file, "%d", &value);\
+              *((int *) array) = value;\
+              array += sizeof (int);\
+            }\
+            continue;\
+        }
+
+#include "commands.h"
+#undef DEF_CMD
+      printf ("Bad syntax! | \"%s\"", str);
+    }
+    return array_copy;
 }
 
 int main (int argc, char *const argv[])
@@ -108,7 +64,7 @@ int main (int argc, char *const argv[])
   char *output_file = 0;
   char *reference_file = 0;
 
-  if (argc == 7)
+  if (argc == 5)
     {
       if (strcmp ("-i", argv[1]) == 0)
         {
@@ -118,10 +74,6 @@ int main (int argc, char *const argv[])
         {
           output_file = argv[4];
         }
-      if (strcmp ("--ref", argv[5]) == 0)
-        {
-          reference_file = argv[6];
-        }
     }
   else
     {
@@ -129,18 +81,15 @@ int main (int argc, char *const argv[])
       return 0;
     }
 
-  // if (!CheckArgs (input_file, output_file, reference_file))
-  // {
-  // return 1;
-  // }
   File input{};
   input = loadFile (input_file);
 
-  int binary_size = getSizeOfBinary (input.raw_data);
+  size_t amount_of_commands = getAmountOfCommands (input.raw_data);
 
-  auto words = (WordBoundaries *) calloc (binary_size, sizeof (WordBoundaries));
-  getWordsBoundaries (input.raw_data, input.size, words);
-  int *binary = createBinary (words, binary_size);
+  FILE *src_file = fopen (input_file, "r");
+
+  char *binary = createBinary (src_file, amount_of_commands);
+  writeBinary (binary, output_file, amount_of_commands);
 
   return 0;
 }

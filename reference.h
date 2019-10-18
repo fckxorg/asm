@@ -1,5 +1,11 @@
 //
-// Created by maxim on 07.10.19.
+// Created by maxim on 15.10.19.
 //
-const char* COMMANDS[] = {"push","pop", "add", "sub", "mul", "div"};
-const int N_COMMANDS = 6;
+#define DEF_CMD(name, num, bytes) CMD_##name=num,
+
+enum Commands{
+
+#include "commands.h"
+
+};
+#undef DEF_CMD

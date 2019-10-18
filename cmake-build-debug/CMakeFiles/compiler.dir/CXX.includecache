@@ -6,6 +6,8 @@
 
 #IncludeRegexTransform: 
 
+/home/maxim/CLionProjects/asm/compiler/commands.h
+
 /home/maxim/CLionProjects/asm/compiler/main.cpp
 cstring
 -
@@ -19,8 +21,12 @@ assert.h
 -
 reference.h
 /home/maxim/CLionProjects/asm/compiler/reference.h
+commands.h
+/home/maxim/CLionProjects/asm/compiler/commands.h
 
 /home/maxim/CLionProjects/asm/compiler/reference.h
+commands.h
+/home/maxim/CLionProjects/asm/compiler/commands.h
 
 /home/maxim/CLionProjects/asm/compiler/string_funcs.h
 
