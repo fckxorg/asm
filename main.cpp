@@ -40,7 +40,7 @@ char *createBinary (FILE *file, size_t amount_of_commands)
       fscanf (file, "%s", str);
       fscanf (file, "%s", arg);
 
-/*#define DEF_CMD(name, n_args, decision_tree)\
+#define DEF_CMD(name, n_args, decision_tree)\
         if (strcmp (str, #name) == 0)\
           {\
             decision_tree\
@@ -48,52 +48,7 @@ char *createBinary (FILE *file, size_t amount_of_commands)
 
 #include "commands.h"
 #undef DEF_CMD
-#undef CMD_ALT*/
-      if (strcmp (str, "PUSH") == 0)
-          {
-          if(isalpha (arg[0])){
-  *array = 11;
-      array++;
-      int arg_type  =2;
-  switch(arg_type){
-    case 1:\
-      *((int *) array) = atoi(arg);\
-      array += sizeof (int);\
-      break;
-      case 2:
-        for (int reg = 0; reg < 4; reg++)
-          {
-            if (strcmp (registers[reg], arg) == 0)
-              {
-                *((int *) array) = reg;
-                array += sizeof (int);
-              }
-          }
-      break;
-    }
-            }
-          if(!isalpha (arg[0])){
-              *array = 1;
-              array++;
-              int arg_type  =1;
-              switch(arg_type){
-                  case 1:\
-      *((int *) array) = atoi(arg);\
-      array += sizeof (int);\
-      break;
-                  case 2:
-                    for (int reg = 0; reg < 4; reg++)
-                      {
-                        if (strcmp (registers[reg], arg) == 0)
-                          {
-                            *((int *) array) = reg;
-                            array += sizeof (int);
-                          }
-                      }
-                  break;
-                }
-            }
-          }
+#undef CMD_ALT
     }
     return array_copy;
 }
