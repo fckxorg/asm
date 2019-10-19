@@ -25,10 +25,12 @@ if(condition){\
             }\
         }\
       break;\
+    default:\
+      continue;\
   }\
 }
 
-DEF_CMD(PUSH, CMD_ 1, CMD_ALT(!isalpha(arg[0]), 1, 1, StackPush(stack, value)) CMD_ALT(isalpha(arg[0]), 2, 11, StackPush(stack, registers[arg])))
+DEF_CMD(PUSH, 1, CMD_ALT(!isalpha(arg[0]), 1, 1, StackPush(stack, value)) CMD_ALT(isalpha(arg[0]), 2, 11, StackPush(stack, registers[arg])))
 DEF_CMD(POP, 0, CMD_ALT(true, 0, 2, StackPop(stack, &status)))
 DEF_CMD(ADD, 0, CMD_ALT(true, 0, 3, StackPush(stack, StackPop(stack, &status) + StackPop(stack, &status))))
 DEF_CMD(SUB, 0, CMD_ALT(true, 0, 4, StackPush(stack, StackPop(stack, &status) - StackPop(stack, &status))))

@@ -38,17 +38,22 @@ char *createBinary (FILE *file, size_t amount_of_commands)
     {
 
       fscanf (file, "%s", str);
-      fscanf (file, "%s", arg);
 
 #define DEF_CMD(name, n_args, decision_tree)\
         if (strcmp (str, #name) == 0)\
           {\
+            if(n_args)\
+            {\
+              fscanf (file, "%s", arg);\
+            }\
             decision_tree\
           }
 
 #include "commands.h"
 #undef DEF_CMD
 #undef CMD_ALT
+
+
     }
     return array_copy;
 }
