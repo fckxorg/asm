@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string_funcs.h"
-#include <assert.h>
-#include "reference.h"
+#include <ctype.h>
+
+const char registers[4][3] = {"ax", "bx", "cx", "dx"};
 
 void writeBinary (const char *binary, const char *filename, size_t amount_of_commands)
 {
@@ -31,29 +32,68 @@ char *createBinary (FILE *file, size_t amount_of_commands)
   char *array = (char *) calloc (amount_of_commands * 32, sizeof (char));
   char *array_copy = array;
   char str[5] = "";
+  char arg[64] = "";
 
   for (int i = 0; i < amount_of_commands; i++)
     {
-      fscanf (file, "%s", str);
 
-#define DEF_CMD(name, num, bytes)\
+      fscanf (file, "%s", str);
+      fscanf (file, "%s", arg);
+
+/*#define DEF_CMD(name, n_args, decision_tree)\
         if (strcmp (str, #name) == 0)\
           {\
-            sprintf (array, "%c", CMD_##name);\
-            int value = 0;\
-            array++;\
-            for (int arg = 0; arg < (bytes - 1) / 4; arg++)\
-            {\
-              fscanf (file, "%d", &value);\
-              *((int *) array) = value;\
-              array += sizeof (int);\
-            }\
-            continue;\
-        }
+            decision_tree\
+          }
 
 #include "commands.h"
 #undef DEF_CMD
-      printf ("Bad syntax! | \"%s\"", str);
+#undef CMD_ALT*/
+      if (strcmp (str, "PUSH") == 0)
+          {
+          if(isalpha (arg[0])){
+  *array = 11;
+      array++;
+      int arg_type  =2;
+  switch(arg_type){
+    case 1:\
+      *((int *) array) = atoi(arg);\
+      array += sizeof (int);\
+      break;
+      case 2:
+        for (int reg = 0; reg < 4; reg++)
+          {
+            if (strcmp (registers[reg], arg) == 0)
+              {
+                *((int *) array) = reg;
+                array += sizeof (int);
+              }
+          }
+      break;
+    }
+            }
+          if(!isalpha (arg[0])){
+              *array = 1;
+              array++;
+              int arg_type  =1;
+              switch(arg_type){
+                  case 1:\
+      *((int *) array) = atoi(arg);\
+      array += sizeof (int);\
+      break;
+                  case 2:
+                    for (int reg = 0; reg < 4; reg++)
+                      {
+                        if (strcmp (registers[reg], arg) == 0)
+                          {
+                            *((int *) array) = reg;
+                            array += sizeof (int);
+                          }
+                      }
+                  break;
+                }
+            }
+          }
     }
     return array_copy;
 }

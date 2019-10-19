@@ -88,9 +88,6 @@
 		<Unit filename="/home/maxim/CLionProjects/asm/compiler/main.cpp">
 			<Option target="compiler"/>
 		</Unit>
-		<Unit filename="/home/maxim/CLionProjects/asm/compiler/reference.h">
-			<Option target="compiler"/>
-		</Unit>
 		<Unit filename="/home/maxim/CLionProjects/asm/compiler/string_funcs.cpp">
 			<Option target="compiler"/>
 		</Unit>
