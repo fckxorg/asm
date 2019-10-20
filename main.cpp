@@ -4,6 +4,11 @@
 #include "string_funcs.h"
 #include <ctype.h>
 
+struct Mark{
+    size_t byte;
+    char name[64];
+};
+
 const char registers[4][3] = {"ax", "bx", "cx", "dx"};
 
 void writeBinary (const char *binary, const char *filename, size_t total_bytes)
@@ -27,9 +32,9 @@ size_t getAmountOfCommands (char *raw_buffer)
   return count;
 }
 
-char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes)
-{
-  char *array = (char *) calloc (amount_of_commands * 32, sizeof (char));
+
+char *processJumps (FILE *file, size_t amount_of_commands, Mark* marks, char* array){
+  Mark* cur_mark = marks;
   char *array_copy = array;
   char str[5] = "";
   char arg[64] = "";
@@ -40,6 +45,60 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes)
 
       fscanf (file, "%s", str);
 
+      if(str[0] == ':')
+        {
+          array++;
+        }
+#define DEF_CMD(name, n_args, decision_tree)\
+        if (strcmp (str, #name) == 0 && #name != "JUMP")\
+          {\
+            array++;\
+            if(n_args)\
+            {\
+              fscanf(file, "%s", arg);\
+              array+=sizeof(int);\
+            }\
+          }\
+
+#include "commands.h"
+#undef DEF_CMD
+      if(strcmp(str, "JUMP") == 0)
+        {
+          fscanf(file, "%s", arg);
+          for(int j = 0; j < amount_of_commands; j++)
+            {
+              if(strcmp (marks[j].name, arg) == 0)
+                {
+                  *((int*)array) = marks[j].byte;
+                  break;
+                }
+            }
+        }
+    }
+  return array_copy;
+}
+
+
+char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, Mark* marks)
+{
+  char *array = (char *) calloc (amount_of_commands * 32, sizeof (char));
+  Mark* cur_mark = marks;
+  char *array_copy = array;
+  char str[5] = "";
+  char arg[64] = "";
+  arg[63]= '\0';
+
+  for (int i = 0; i < amount_of_commands; i++)
+    {
+
+      fscanf (file, "%s", str);
+
+      if(str[0] == ':')
+        {
+          cur_mark->byte = array - array_copy;
+          memcpy (cur_mark->name, str+1, 64);
+          cur_mark++;
+        }
 #define DEF_CMD(name, n_args, decision_tree)\
         if (strcmp (str, #name) == 0)\
           {\
@@ -52,20 +111,19 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes)
 
 #include "commands.h"
 #undef DEF_CMD
-#undef CMD_ALT
 
           memset (arg, 0, 63);
           memset (str, 0, 4);
     }
     *total_bytes = array - array_copy;
-    return array_copy;
+    rewind(file);
+    return processJumps (file, amount_of_commands, marks, array_copy);
 }
 
 int main (int argc, char *const argv[])
 {
   char *input_file = 0;
   char *output_file = 0;
-  char *reference_file = 0;
 
   if (argc == 5)
     {
@@ -91,8 +149,9 @@ int main (int argc, char *const argv[])
   size_t total_bytes = 0;
 
   FILE *src_file = fopen (input_file, "r");
+  Mark* marks = (Mark *) calloc (amount_of_commands, sizeof(Mark));
 
-  char *binary = createBinary (src_file, amount_of_commands, &total_bytes);
+  char *binary = createBinary (src_file, amount_of_commands, &total_bytes, marks);
   writeBinary (binary, output_file, total_bytes);
 
   return 0;

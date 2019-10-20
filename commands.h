@@ -4,6 +4,7 @@
 //0 - no args
 //1 - int args
 //2 - str args
+//3 - address
 //DEF_CMD(name. n_args, CMD_ALT(condition, arg_type, opcode, code) CMD_ALT(condition, arg_type, opcode, code))
 
 #define CMD_ALT(condition, arg_type, opcode, code)\
@@ -25,6 +26,11 @@ if(condition){\
             }\
         }\
       break;\
+    case 3: \
+      *((int *) array) = cur_mark->byte;\
+      cur_mark++;\
+      array += sizeof (int);\
+      break;\
     default:\
       break;\
   }\
@@ -36,3 +42,4 @@ DEF_CMD(ADD, 0, CMD_ALT(true, 0, 3, StackPush(stack, StackPop(stack, &status) + 
 DEF_CMD(SUB, 0, CMD_ALT(true, 0, 4, StackPush(stack, StackPop(stack, &status) - StackPop(stack, &status))))
 DEF_CMD(MUL, 0, CMD_ALT(true, 0, 5, StackPush(stack, StackPop(stack, &status) * StackPop(stack, &status))))
 DEF_CMD(DIV,  0, CMD_ALT(true, 0, 6, StackPush(stack, StackPop(stack, &status) / StackPop(stack, &status))))
+DEF_CMD(JUMP, 1, CMD_ALT (true, 3, 7, buffer = start))
