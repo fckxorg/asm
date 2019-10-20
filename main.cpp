@@ -6,10 +6,10 @@
 
 const char registers[4][3] = {"ax", "bx", "cx", "dx"};
 
-void writeBinary (const char *binary, const char *filename, size_t amount_of_commands)
+void writeBinary (const char *binary, const char *filename, size_t total_bytes)
 {
   FILE *file = fopen (filename, "wb");
-  fwrite (binary, sizeof (char), amount_of_commands * 4, file);
+  fwrite (binary, sizeof (char), total_bytes, file);
   fclose (file);
 }
 
@@ -27,12 +27,13 @@ size_t getAmountOfCommands (char *raw_buffer)
   return count;
 }
 
-char *createBinary (FILE *file, size_t amount_of_commands)
+char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes)
 {
   char *array = (char *) calloc (amount_of_commands * 32, sizeof (char));
   char *array_copy = array;
   char str[5] = "";
   char arg[64] = "";
+  arg[63]= '\0';
 
   for (int i = 0; i < amount_of_commands; i++)
     {
@@ -47,14 +48,16 @@ char *createBinary (FILE *file, size_t amount_of_commands)
               fscanf (file, "%s", arg);\
             }\
             decision_tree\
-          }
+          }\
 
 #include "commands.h"
 #undef DEF_CMD
 #undef CMD_ALT
 
-
+          memset (arg, 0, 63);
+          memset (str, 0, 4);
     }
+    *total_bytes = array - array_copy;
     return array_copy;
 }
 
@@ -85,11 +88,12 @@ int main (int argc, char *const argv[])
   input = loadFile (input_file);
 
   size_t amount_of_commands = getAmountOfCommands (input.raw_data);
+  size_t total_bytes = 0;
 
   FILE *src_file = fopen (input_file, "r");
 
-  char *binary = createBinary (src_file, amount_of_commands);
-  writeBinary (binary, output_file, amount_of_commands);
+  char *binary = createBinary (src_file, amount_of_commands, &total_bytes);
+  writeBinary (binary, output_file, total_bytes);
 
   return 0;
 }

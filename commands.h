@@ -9,7 +9,7 @@
 #define CMD_ALT(condition, arg_type, opcode, code)\
 if(condition){\
   *array = opcode;\
-      array++;\
+  array++;\
   switch(arg_type){\
     case 1:\
       *((int *) array) = atoi(arg);\
@@ -26,14 +26,13 @@ if(condition){\
         }\
       break;\
     default:\
-      continue;\
+      break;\
   }\
 }
 
 DEF_CMD(PUSH, 1, CMD_ALT(!isalpha(arg[0]), 1, 1, StackPush(stack, value)) CMD_ALT(isalpha(arg[0]), 2, 11, StackPush(stack, registers[arg])))
-DEF_CMD(POP, 0, CMD_ALT(true, 0, 2, StackPop(stack, &status)))
+DEF_CMD(POP, 1, CMD_ALT(true, 2, 2, registers[arg] = StackPop(stack, &status)))
 DEF_CMD(ADD, 0, CMD_ALT(true, 0, 3, StackPush(stack, StackPop(stack, &status) + StackPop(stack, &status))))
 DEF_CMD(SUB, 0, CMD_ALT(true, 0, 4, StackPush(stack, StackPop(stack, &status) - StackPop(stack, &status))))
 DEF_CMD(MUL, 0, CMD_ALT(true, 0, 5, StackPush(stack, StackPop(stack, &status) * StackPop(stack, &status))))
 DEF_CMD(DIV,  0, CMD_ALT(true, 0, 6, StackPush(stack, StackPop(stack, &status) / StackPop(stack, &status))))
-
