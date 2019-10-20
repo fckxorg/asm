@@ -44,13 +44,24 @@ char *processJumps (FILE *file, size_t amount_of_commands, Mark* marks, char* ar
     {
 
       fscanf (file, "%s", str);
+#define DEF_JUMP(cmd, opcode, code)\
+if(strcmp(str, #cmd) == 0)\
+{\
+  array++;\
+  fscanf(file, "%s", arg);\
+      for(int j = 0; j < amount_of_commands; j++)\
+        {\
+          if(strcmp (marks[j].name, arg) == 0)\
+            {\
+              *((int*)array) = marks[j].byte;\
+              array+=sizeof(int);\
+              break;\
+            }\
+        }\
+}
 
-      if(str[0] == ':')
-        {
-          array++;
-        }
-#define DEF_CMD(name, n_args, decision_tree)\
-        if (strcmp (str, #name) == 0 && #name != "JUMP")\
+#define DEF_CMD(cmd, n_args, decision_tree)\
+        if (strcmp (str, #cmd) == 0)\
           {\
             array++;\
             if(n_args)\
@@ -62,18 +73,7 @@ char *processJumps (FILE *file, size_t amount_of_commands, Mark* marks, char* ar
 
 #include "commands.h"
 #undef DEF_CMD
-      if(strcmp(str, "JUMP") == 0)
-        {
-          fscanf(file, "%s", arg);
-          for(int j = 0; j < amount_of_commands; j++)
-            {
-              if(strcmp (marks[j].name, arg) == 0)
-                {
-                  *((int*)array) = marks[j].byte;
-                  break;
-                }
-            }
-        }
+#undef DEF_JUMP
     }
   return array_copy;
 }
@@ -99,18 +99,29 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
           memcpy (cur_mark->name, str+1, 64);
           cur_mark++;
         }
-#define DEF_CMD(name, n_args, decision_tree)\
-        if (strcmp (str, #name) == 0)\
+#define DEF_CMD(cmd, n_args, decision_tree)\
+        if (strcmp (str, #cmd) == 0)\
           {\
             if(n_args)\
             {\
               fscanf (file, "%s", arg);\
             }\
             decision_tree\
-          }\
+          }
+
+#define DEF_JUMP(cmd, opcode, code)\
+        if(strcmp(str, #cmd) == 0)\
+        {\
+          *array = opcode;\
+          array++;\
+          *((int *) array) = 0;\
+          array += sizeof (int);\
+          fscanf (file, "%s", arg);\
+        }
 
 #include "commands.h"
 #undef DEF_CMD
+#undef DEF_JUMP
 
           memset (arg, 0, 63);
           memset (str, 0, 4);
