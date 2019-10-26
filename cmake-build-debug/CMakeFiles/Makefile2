@@ -6,6 +6,16 @@ default_target: all
 
 .PHONY : default_target
 
+# The main recursive all target
+all:
+
+.PHONY : all
+
+# The main recursive preinstall target
+preinstall:
+
+.PHONY : preinstall
+
 #=============================================================================
 # Special targets provided by cmake.
 
@@ -52,20 +62,10 @@ CMAKE_BINARY_DIR = /home/maxim/CLionProjects/asm/compiler/cmake-build-debug
 #=============================================================================
 # Directory level rules for the build root directory
 
-# The main recursive "all" target.
-all: CMakeFiles/compiler.dir/all
-
-.PHONY : all
-
 # The main recursive "clean" target.
 clean: CMakeFiles/compiler.dir/clean
 
 .PHONY : clean
-
-# The main recursive "preinstall" target.
-preinstall:
-
-.PHONY : preinstall
 
 #=============================================================================
 # Target rules for target CMakeFiles/compiler.dir
@@ -76,6 +76,11 @@ CMakeFiles/compiler.dir/all:
 	$(MAKE) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maxim/CLionProjects/asm/compiler/cmake-build-debug/CMakeFiles --progress-num=1,2,3 "Built target compiler"
 .PHONY : CMakeFiles/compiler.dir/all
+
+# Include target in all.
+all: CMakeFiles/compiler.dir/all
+
+.PHONY : all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/compiler.dir/rule: cmake_check_build_system

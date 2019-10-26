@@ -45,6 +45,7 @@ DEF_CMD(SUB, 0, CMD_ALT(true, 0, 4, StackPush(stack, StackPop(stack, &status) - 
 DEF_CMD(MUL, 0, CMD_ALT(true, 0, 5, StackPush(stack, StackPop(stack, &status) * StackPop(stack, &status))))
 DEF_CMD(DIV,  0, CMD_ALT(true, 0, 6, StackPush(stack, StackPop(stack, &status) / StackPop(stack, &status))))
 DEF_CMD(OUT, 0, CMD_ALT (true, 0, 15, printf("%d\n", StackPop(stack, &status))))
+DEF_CMD(IN, 0, CMD_ALT (true, 0, 16, scanf("%d", value)))
 
 DEF_JUMP(JUMP, 7, buffer = 0)
 DEF_JUMP(JE, 8, if(StackPop(stack, &status) == Stack(stack, &status)){buffer = 0})
@@ -53,3 +54,5 @@ DEF_JUMP(JA, 10, if(StackPop(stack, &status) > StackPop(stack, &status)){buffer 
 DEF_JUMP(JAE, 12, if(StackPop(stack, &status) >= StackPop(stack, &status)){buffer = 0})
 DEF_JUMP(JB, 13, if(StackPop(stack, &status) < StackPop(stack, &status)){buffer = 0})
 DEF_JUMP(JBE, 14, if(StackPop(stack, &status) <= StackPop(stack, &status)){buffer = 0})
+DEF_JUMP(CALL, 17, true)
+DEF_JUMP(RET, 18, )

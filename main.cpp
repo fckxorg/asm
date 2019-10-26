@@ -114,8 +114,11 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
         {\
           *array = opcode;\
           array++;\
-          *((int *) array) = 0;\
-          array += sizeof (int);\
+          if(strcmp(#cmd, "RET") != 0)\
+          {\
+            *((int *) array) = 0;\
+            array += sizeof (int);\
+          }\
           fscanf (file, "%s", arg);\
         }
 
