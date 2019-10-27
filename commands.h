@@ -55,4 +55,4 @@ DEF_JUMP(JAE, 12, if(StackPop(stack, &status) >= StackPop(stack, &status)){buffe
 DEF_JUMP(JB, 13, if(StackPop(stack, &status) < StackPop(stack, &status)){buffer = 0})
 DEF_JUMP(JBE, 14, if(StackPop(stack, &status) <= StackPop(stack, &status)){buffer = 0})
 DEF_JUMP(CALL, 17, true)
-DEF_JUMP(RET, 18, )
+DEF_JUMP(RET, 18, true)
