@@ -70,6 +70,14 @@ DEF_CMD(MUL, 0, CMD_ALT(true, 0, 5, StackPush(stack, StackPop(stack, &status) * 
 DEF_CMD(DIV,  0, CMD_ALT(true, 0, 6, StackPush(stack, StackPop(stack, &status) / StackPop(stack, &status))))
 DEF_CMD(OUT, 0, CMD_ALT (true, 0, 15, printf("%d\n", StackPop(stack, &status))))
 DEF_CMD(IN, 0, CMD_ALT (true, 0, 16, scanf("%d", value)))
+DEF_CMD(GSET, 1, CMD_ALT (true, 1, 19, graphics[arg] = StackPop(stack, status)))
+DEF_CMD(GOUT, 0, CMD_ALT (true, 0, 20,
+                          clrscr();
+                              for(int i = 0; i < 64; i++){
+                                  if(i % 64 == 0) printf("\n");
+                                  printf("\u001b[%dm \u001b[0m", graphics[i]);
+                                }))
+
 
 DEF_JUMP(JUMP, 7, buffer = 0)
 DEF_JUMP(JE, 8, if(StackPop(stack, &status) == Stack(stack, &status)){buffer = 0})
