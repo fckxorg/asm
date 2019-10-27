@@ -99,6 +99,7 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
           memcpy (cur_mark->name, str+1, 64);
           cur_mark++;
         }
+        else
 #define DEF_CMD(cmd, n_args, decision_tree)\
         if (strcmp (str, #cmd) == 0)\
           {\
