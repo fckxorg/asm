@@ -37,9 +37,11 @@ if(condition){\
 
 DEF_CMD(PUSH, 1,  CMD_ALT(!isalpha(arg[0]) && arg[0]!='[', 1, 1, StackPush(stack, value))
                   CMD_ALT(arg[1] == 'x', 2, 11, StackPush(stack, registers[arg]))
-                  CMD_ALT (arg[0]== '[', 4, 21, StackPush(stack, mem[atoi(arg+1)])))
+                  CMD_ALT (arg[0]== '[' && arg[2]!='x', 4, 21, StackPush(stack, mem[atoi(arg+1)]))
+                  CMD_ALT (arg[0] == '[' && arg[2] == 'x', 4, 31, StackPush(stack, mem[registers[arg]])))
 DEF_CMD(POP, 1, CMD_ALT(arg[1] == 'x', 2, 2, registers[arg] = StackPop(stack, &status))
-                CMD_ALT(arg[0] == '[', 4, 22, mem[atoi(arg+1)] = StackPop(stack, &status)))
+                CMD_ALT(arg[0] == '[' && arg[2] != 'x', 4, 22, mem[atoi(arg+1)] = StackPop(stack, &status))
+                CMD_ALT (arg[0] == '[' && arg[2] == 'x', 4, 32, mem[registers[arg]] = StackPop(stack, &status)))
 DEF_CMD(ADD, 0, CMD_ALT(true, 0, 3, StackPush(stack, StackPop(stack, &status) + StackPop(stack, &status))))
 DEF_CMD(SUB, 0, CMD_ALT(true, 0, 4, StackPush(stack, StackPop(stack, &status) - StackPop(stack, &status))))
 DEF_CMD(MUL, 0, CMD_ALT(true, 0, 5, StackPush(stack, StackPop(stack, &status) * StackPop(stack, &status))))
