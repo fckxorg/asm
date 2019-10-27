@@ -87,6 +87,7 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
   char str[5] = "";
   char arg[64] = "";
   arg[63]= '\0';
+  bool status = false;
 
   for (int i = 0; i < amount_of_commands; i++)
     {
@@ -127,7 +128,7 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
 #undef DEF_CMD
 #undef DEF_JUMP
       {
-        printf("Bad syntax! Command '%s' doesn't exist. \n", str);
+        printf("Bad syntax! Command '%s' doesn't exist. \n", str); exit(-1);
       }
           memset (arg, 0, 63);
           memset (str, 0, 4);
