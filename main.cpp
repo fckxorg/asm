@@ -90,7 +90,6 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
 
   for (int i = 0; i < amount_of_commands; i++)
     {
-
       fscanf (file, "%s", str);
 
       if(str[0] == ':')
@@ -107,7 +106,8 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
               fscanf (file, "%s", arg);\
             }\
             decision_tree\
-          }
+          }\
+        else
 
 #define DEF_JUMP(cmd, opcode, code)\
         if(strcmp(str, #cmd) == 0)\
@@ -120,12 +120,15 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
             array += sizeof (int);\
           }\
           fscanf (file, "%s", arg);\
-        }
+        }\
+        else
 
 #include "commands.h"
 #undef DEF_CMD
 #undef DEF_JUMP
-
+      {
+        printf("Bad syntax! Command '%s' doesn't exist. \n", str);
+      }
           memset (arg, 0, 63);
           memset (str, 0, 4);
     }
