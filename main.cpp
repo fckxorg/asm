@@ -144,9 +144,14 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
 #include "commands.h"
 #undef DEF_CMD
 #undef DEF_JUMP
-      {
-        printf("Bad syntax! Command '%s' doesn't exist. \n", str); exit(-1);
-      }
+      if(strcmp (str, "") == 0)
+        {
+          continue;
+        }
+      else
+        {
+          printf("Bad syntax! Command '%s' doesn't exist. \n", str); exit(-1);
+        }
           memset (arg, 0, 63);
           memset (str, 0, 4);
     }
