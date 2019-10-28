@@ -3,6 +3,7 @@
 
 CMakeFiles/compiler.dir/main.cpp.o
  /home/maxim/CLionProjects/asm/compiler/commands.h
+ /home/maxim/CLionProjects/asm/compiler/config.h
  /home/maxim/CLionProjects/asm/compiler/main.cpp
  /home/maxim/CLionProjects/asm/compiler/string_funcs.h
 CMakeFiles/compiler.dir/string_funcs.cpp.o

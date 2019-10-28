@@ -16,6 +16,8 @@ const int GRAPHICS_BUFFER_SIZE = 256;
 
 const int GRAPHICS_LINE_SIZE  = 16;
 
+const int BYTES_ARRAY_COEFFICIENT = 32;
+
 enum Arg_types {
     NO_ARGS = 0,
     IMMED  = 1,

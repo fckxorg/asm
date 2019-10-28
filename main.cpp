@@ -13,6 +13,13 @@ struct Mark{
 
 const char registers[N_REGISTERS][MAX_REGISTER_NAME_LENGTH] = {"ax", "bx", "cx", "dx"};
 
+char* forwardBuffer(char *buffer)
+{
+  while(*buffer != ' ' && *buffer != '\n' && *buffer != '\0') buffer++;
+  buffer++;
+  return buffer;
+}
+
 void writeBinary (const char *binary, const char *filename, size_t total_bytes)
 {
   assert(binary);
@@ -23,8 +30,8 @@ void writeBinary (const char *binary, const char *filename, size_t total_bytes)
   fclose (file);
 }
 
-char *processJumps (FILE *file, size_t amount_of_lines, Mark* marks, char* array){
-  assert(file);
+char *processJumps (char* buffer, size_t amount_of_lines, Mark* marks, char* array){
+  assert(buffer);
   assert(array);
   assert(marks);
 
@@ -36,14 +43,16 @@ char *processJumps (FILE *file, size_t amount_of_lines, Mark* marks, char* array
 
   for (int i = 0; i < amount_of_lines; i++)
     {
-      fscanf (file, "%s", str);
+      sscanf (buffer, "%s", str);
+      buffer = forwardBuffer (buffer);
 
 #define DEF_JUMP(cmd, opcode, code)\
 if(strcmp(str, #cmd) == 0)\
 {\
   array++;\
-  fscanf(file, "%s", arg);\
-      for(int j = 0; j < amount_of_commands; j++)\
+  sscanf(buffer, "%s", arg);\
+  buffer = forwardBuffer(buffer);\
+      for(int j = 0; j < N_REGISTERS; j++)\
         {\
           if(strcmp (marks[j].name, arg) == 0)\
             {\
@@ -60,7 +69,8 @@ if(strcmp(str, #cmd) == 0)\
             array++;\
             if(n_args)\
             {\
-              fscanf(file, "%s", arg);\
+              sscanf(buffer, "%s", arg);\
+              buffer = forwardBuffer(buffer);\
               array+=sizeof(int);\
             }\
           }\
@@ -74,38 +84,43 @@ if(strcmp(str, #cmd) == 0)\
 }
 
 
-char *createBinary (FILE *file, size_t amount_of_lines, size_t* total_bytes, Mark* marks)
+char *createBinary (char *buffer, size_t amount_of_lines, size_t* total_bytes, Mark* marks)
 {
-  assert(file);
+  assert(buffer);
   assert(total_bytes);
   assert(marks);
 
-  char *array = (char *) calloc (amount_of_lines * 32, sizeof (char));
+  char *buffer_copy = buffer;
+  char *array = (char *) calloc (amount_of_lines * BYTES_ARRAY_COEFFICIENT, sizeof (char));
+
   Mark* cur_mark = marks;
+
   char *array_copy = array;
   char str[MAX_COMMAND_NAME_LENGTH] = "";
   char arg[MAX_ARG_LENGTH] = "";
   arg[MAX_ARG_LENGTH - 1]= '\0';
+
   bool status = false;
 
   for (int i = 0; i < amount_of_lines; i++)
     {
-      fscanf (file, "%s", str);
+      sscanf (buffer, "%s", str);
+      buffer = forwardBuffer (buffer);
 
       if(str[0] == ':')
         {
           cur_mark->byte = array - array_copy;
           memcpy (cur_mark->name, str+1, 64);
           cur_mark++;
+          continue;
         }
-        else
-
 #define DEF_CMD(cmd, n_args, decision_tree)\
         if (strcmp (str, #cmd) == 0)\
           {\
             if(n_args)\
             {\
-              fscanf (file, "%s", arg);\
+              sscanf (buffer, "%s", arg);\
+              buffer = forwardBuffer(buffer);\
             }\
             decision_tree\
           }\
@@ -121,7 +136,8 @@ char *createBinary (FILE *file, size_t amount_of_lines, size_t* total_bytes, Mar
             *((int *) array) = 0;\
             array += sizeof (int);\
           }\
-          fscanf (file, "%s", arg);\
+          sscanf (buffer, "%s", arg);\
+          buffer = forwardBuffer(buffer);\
         }\
         else
 
@@ -140,8 +156,7 @@ char *createBinary (FILE *file, size_t amount_of_lines, size_t* total_bytes, Mar
           memset (str, 0, MAX_COMMAND_NAME_LENGTH - 1);
     }
     *total_bytes = array - array_copy;
-    rewind(file);
-    return processJumps (file, amount_of_lines, marks, array_copy);
+    return processJumps (buffer_copy, amount_of_lines, marks, array_copy);
 }
 
 int main (int argc, char *const argv[])
@@ -172,12 +187,13 @@ int main (int argc, char *const argv[])
   size_t amount_of_lines = getNumberOfLines (input.raw_data);
   size_t total_bytes = 0;
 
-  FILE *src_file = fopen (input_file, "r");
   Mark* marks = (Mark *) calloc (amount_of_lines, sizeof(Mark));
 
-  char *binary = createBinary (src_file, amount_of_lines, &total_bytes, marks);
+  char *binary = createBinary (input.raw_data, amount_of_lines, &total_bytes, marks);
   writeBinary (binary, output_file, total_bytes);
 
-  fclose(src_file);
+  free(binary);
+  free(input.raw_data);
+  free(input.data);
   return 0;
 }
