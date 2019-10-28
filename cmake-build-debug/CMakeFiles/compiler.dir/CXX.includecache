@@ -19,6 +19,8 @@ string_funcs.h
 /home/maxim/CLionProjects/asm/compiler/string_funcs.h
 ctype.h
 -
+assert.h
+-
 commands.h
 /home/maxim/CLionProjects/asm/compiler/commands.h
 commands.h

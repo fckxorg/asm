@@ -82,6 +82,7 @@ DEF_CMD(GOUT, 0, CMD_ALT (true, 0, 20,
                                   if(i % 16 == 0) printf("\n");
                                   printf("\u001b[%dm \u001b[0m", graphics[i]);
                                 }))
+DEF_CMD(SQRT, 0, CMD_ALT (true, 0, 24, StackPush(stack, sqrt(StackPop(stack, &status)))))
 
 
 DEF_JUMP(JUMP, 7, buffer = 0)
