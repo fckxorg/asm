@@ -69,13 +69,13 @@ if(condition){\
 //============================================
 //	name	n_args	overload	condition			arg_type	opcode  code
 
-DEF_CMD (PUSH, 	1,  	CMD_ALT (!isalpha(arg[0]) && arg[0]!='[', 	IMMED, 		1, 	StackPush(stack, value))
+DEF_CMD (PUSH, 	1,  	CMD_ALT (!isalpha(arg[0]) && arg[0]!='[', 	IMMED, 		1, 	StackPush(stack, arg))
                   	CMD_ALT (arg[1] == 'x', 			REG, 		11, 	StackPush(stack, registers[arg]))
-                  	CMD_ALT (arg[0]== '[' && arg[2]!='x', 		MEM_IMMED, 	21, 	StackPush(stack, mem[atoi(arg+1)]))
+                  	CMD_ALT (arg[0]== '[' && arg[2]!='x', 		MEM_IMMED, 	21, 	StackPush(stack, mem[arg]))
                   	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	REG_IMMED, 	31, 	StackPush(stack, mem[registers[arg]])))
 
 DEF_CMD (POP, 	1, 	CMD_ALT (arg[1] == 'x', 			REG, 		2, 	registers[arg] = StackPop(stack, &status))
-                	CMD_ALT (arg[0] == '[' && arg[2] != 'x', 	MEM_IMMED, 	22, 	mem[atoi(arg+1)] = StackPop(stack, &status))
+                	CMD_ALT (arg[0] == '[' && arg[2] != 'x', 	MEM_IMMED, 	22, 	mem[arg] = StackPop(stack, &status))
                 	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	MEM_REG, 	32, 	mem[registers[arg]] = StackPop(stack, &status)))
 
 DEF_CMD (ADD, 	0, 	CMD_ALT (true, 					NO_ARG, 	3, 	StackPush(stack, StackPop(stack, &status) + StackPop(stack, &status))))
@@ -112,17 +112,17 @@ DEF_CMD (SQRT, 	0, 	CMD_ALT (true, 					NO_ARG, 	24, 	StackPush(stack, sqrt(Stac
 
 DEF_JUMP (JUMP, 	7, 	true)
 
-DEF_JUMP (JE, 		8, 	if(StackPop(stack, &status) == Stack(stack, &status)){buffer = 0})
+DEF_JUMP (JE, 		8, 	StackPop(stack, &status) == Stack(stack, &status)
 
-DEF_JUMP (JNE, 		9, 	if(StackPop(stack, &status) != Stack(stack, &status)){buffer = 0})
+DEF_JUMP (JNE, 		9, 	StackPop(stack, &status) != Stack(stack, &status))
 
-DEF_JUMP (JA, 		10, 	if(StackPop(stack, &status) > StackPop(stack, &status)){buffer = 0})
+DEF_JUMP (JA, 		10, 	StackPop(stack, &status) > StackPop(stack, &status))
 
-DEF_JUMP (JAE, 		12, 	if(StackPop(stack, &status) >= StackPop(stack, &status)){buffer = 0})
+DEF_JUMP (JAE, 		12, 	StackPop(stack, &status) >= StackPop(stack, &status))
 
-DEF_JUMP (JB, 		13, 	if(StackPop(stack, &status) < StackPop(stack, &status)){buffer = 0})
+DEF_JUMP (JB, 		13, 	StackPop(stack, &status) < StackPop(stack, &status))
 
-DEF_JUMP (JBE, 		14, 	if(StackPop(stack, &status) <= StackPop(stack, &status)){buffer = 0})
+DEF_JUMP (JBE, 		14, 	StackPop(stack, &status) <= StackPop(stack, &status))
 
 DEF_JUMP (CALL, 	17, 	true)
 
