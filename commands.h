@@ -7,8 +7,6 @@
 //3 - address
 //DEF_CMD(name. n_args, CMD_ALT(condition, arg_type, opcode, code) CMD_ALT(condition, arg_type, opcode, code))
 
-void parseRegister(bool *status, char** registers, char** array){}
-
 #define CMD_ALT(condition, arg_type, opcode, code)\
 if(condition){\
   *array = opcode;\
