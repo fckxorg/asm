@@ -7,15 +7,19 @@
 //3 - address
 //DEF_CMD(name. n_args, CMD_ALT(condition, arg_type, opcode, code) CMD_ALT(condition, arg_type, opcode, code))
 
+void parseRegister(bool *status, char** registers, char** array){}
+
 #define CMD_ALT(condition, arg_type, opcode, code)\
 if(condition){\
   *array = opcode;\
   array++;\
+  \
   switch(arg_type){\
     case 1:\
       *((int *) array) = atoi(arg);\
       array += sizeof (int);\
       break;\
+      \
     case 2:\
       status = false;\
       for(int reg =0 ; reg < 4; reg++)\
@@ -32,10 +36,12 @@ if(condition){\
             printf("Bad parameter! Register '%s' doesn't exist! \n", arg); exit(-1);\
           }\
         break;\
+        \
     case 4:\
       *((int *) array) = atoi(arg+1);\
       array += sizeof (int);\
       break;\
+      \
     case 5:\
       status = false;\
       *(arg+3) = '\0';\

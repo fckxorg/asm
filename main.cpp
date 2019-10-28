@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "string_funcs.h"
 #include <ctype.h>
+#include <assert.h>
 
 struct Mark{
     size_t byte;
@@ -13,6 +14,9 @@ const char registers[4][3] = {"ax", "bx", "cx", "dx"};
 
 void writeBinary (const char *binary, const char *filename, size_t total_bytes)
 {
+  assert(binary);
+  assert (filename);
+
   FILE *file = fopen (filename, "wb");
   fwrite (binary, sizeof (char), total_bytes, file);
   fclose (file);
@@ -20,6 +24,8 @@ void writeBinary (const char *binary, const char *filename, size_t total_bytes)
 
 size_t getAmountOfCommands (char *raw_buffer)
 {
+  assert(raw_buffer);
+
   size_t count = 0;
   while (*raw_buffer)
     {
@@ -34,6 +40,10 @@ size_t getAmountOfCommands (char *raw_buffer)
 
 
 char *processJumps (FILE *file, size_t amount_of_commands, Mark* marks, char* array){
+  assert(file);
+  assert(array);
+  assert(marks);
+
   Mark* cur_mark = marks;
   char *array_copy = array;
   char str[5] = "";
@@ -42,8 +52,8 @@ char *processJumps (FILE *file, size_t amount_of_commands, Mark* marks, char* ar
 
   for (int i = 0; i < amount_of_commands; i++)
     {
-
       fscanf (file, "%s", str);
+
 #define DEF_JUMP(cmd, opcode, code)\
 if(strcmp(str, #cmd) == 0)\
 {\
@@ -75,12 +85,17 @@ if(strcmp(str, #cmd) == 0)\
 #undef DEF_CMD
 #undef DEF_JUMP
     }
+
   return array_copy;
 }
 
 
 char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, Mark* marks)
 {
+  assert(file);
+  assert(total_bytes);
+  assert(marks);
+
   char *array = (char *) calloc (amount_of_commands * 32, sizeof (char));
   Mark* cur_mark = marks;
   char *array_copy = array;
@@ -100,6 +115,7 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
           cur_mark++;
         }
         else
+
 #define DEF_CMD(cmd, n_args, decision_tree)\
         if (strcmp (str, #cmd) == 0)\
           {\
@@ -173,5 +189,6 @@ int main (int argc, char *const argv[])
   char *binary = createBinary (src_file, amount_of_commands, &total_bytes, marks);
   writeBinary (binary, output_file, total_bytes);
 
+  fclose(src_file);
   return 0;
 }
