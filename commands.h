@@ -1,11 +1,8 @@
 //
 // Created by maxim on 15.10.19.
 //
-//0 - no args
-//1 - int args
-//2 - str args
-//3 - address
-//DEF_CMD(name. n_args, CMD_ALT(condition, arg_type, opcode, code) CMD_ALT(condition, arg_type, opcode, code))
+
+#include "config.h"
 
 #define CMD_ALT(condition, arg_type, opcode, code)\
 if(condition){\
@@ -13,14 +10,14 @@ if(condition){\
   array++;\
   \
   switch(arg_type){\
-    case 1:\
+    case IMMED:\
       *((int *) array) = atoi(arg);\
       array += sizeof (int);\
       break;\
       \
-    case 2:\
+    case REG:\
       status = false;\
-      for(int reg =0 ; reg < 4; reg++)\
+      for(int reg = 0 ; reg < N_REGISTERS; reg++)\
         {\
           if(strcmp(registers[reg], arg) == 0)\
             {\
@@ -35,15 +32,15 @@ if(condition){\
           }\
         break;\
         \
-    case 4:\
+    case MEM_IMMED:\
       *((int *) array) = atoi(arg+1);\
       array += sizeof (int);\
       break;\
       \
-    case 5:\
+    case MEM_REG:\
       status = false;\
-      *(arg+3) = '\0';\
-      for(int reg =0 ; reg < 4; reg++)\
+      *(arg + MAX_REGISTER_NAME_LENGTH) = '\0';\
+      for(int reg =0 ; reg < N_REGISTERS; reg++)\
         {\
           if(strcmp(registers[reg], arg+1) == 0)\
             {\
@@ -91,8 +88,8 @@ DEF_CMD	(GSET, 	1, 	CMD_ALT (!isalpha(arg[0]), 			1, 		19, 	graphics[arg] = Stac
                  	CMD_ALT (arg[1] == 'x', 			2, 		23, 	graphics[registers[arg]] = StackPop(stack, &status)))
 
 DEF_CMD (GOUT, 	0, 	CMD_ALT (true, 					0, 		20,	clrscr();
-												for(int i = 0; i < 256; i++){
-													if(i % 16 == 0) printf("\n");
+												for(int i = 0; i < GRAPHICS_BUFFER_SIZE; i++){
+													if(i % GRAPHICS_LINE_SIZE == 0) printf("\n");
 													printf("\u001b[%dm \u001b[0m", graphics[i]);
                                 								}))
 

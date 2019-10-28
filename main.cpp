@@ -1,16 +1,17 @@
 #include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
-#include "string_funcs.h"
 #include <ctype.h>
 #include <assert.h>
+#include "string_funcs.h"
+#include "config.h"
 
 struct Mark{
     size_t byte;
-    char name[64];
+    char name[MAX_MARK_NAME_LENGTH];
 };
 
-const char registers[4][3] = {"ax", "bx", "cx", "dx"};
+const char registers[N_REGISTERS][MAX_REGISTER_NAME_LENGTH] = {"ax", "bx", "cx", "dx"};
 
 void writeBinary (const char *binary, const char *filename, size_t total_bytes)
 {
@@ -22,35 +23,18 @@ void writeBinary (const char *binary, const char *filename, size_t total_bytes)
   fclose (file);
 }
 
-size_t getAmountOfCommands (char *raw_buffer)
-{
-  assert(raw_buffer);
-
-  size_t count = 0;
-  while (*raw_buffer)
-    {
-      if (*raw_buffer == '\n')
-        {
-          count++;
-        }
-      raw_buffer++;
-    }
-  return count;
-}
-
-
-char *processJumps (FILE *file, size_t amount_of_commands, Mark* marks, char* array){
+char *processJumps (FILE *file, size_t amount_of_lines, Mark* marks, char* array){
   assert(file);
   assert(array);
   assert(marks);
 
   Mark* cur_mark = marks;
   char *array_copy = array;
-  char str[5] = "";
-  char arg[64] = "";
-  arg[63]= '\0';
+  char str[MAX_COMMAND_NAME_LENGTH] = "";
+  char arg[MAX_ARG_LENGTH] = "";
+  arg[MAX_ARG_LENGTH - 1]= '\0';
 
-  for (int i = 0; i < amount_of_commands; i++)
+  for (int i = 0; i < amount_of_lines; i++)
     {
       fscanf (file, "%s", str);
 
@@ -90,21 +74,21 @@ if(strcmp(str, #cmd) == 0)\
 }
 
 
-char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, Mark* marks)
+char *createBinary (FILE *file, size_t amount_of_lines, size_t* total_bytes, Mark* marks)
 {
   assert(file);
   assert(total_bytes);
   assert(marks);
 
-  char *array = (char *) calloc (amount_of_commands * 32, sizeof (char));
+  char *array = (char *) calloc (amount_of_lines * 32, sizeof (char));
   Mark* cur_mark = marks;
   char *array_copy = array;
-  char str[5] = "";
-  char arg[64] = "";
-  arg[63]= '\0';
+  char str[MAX_COMMAND_NAME_LENGTH] = "";
+  char arg[MAX_ARG_LENGTH] = "";
+  arg[MAX_ARG_LENGTH - 1]= '\0';
   bool status = false;
 
-  for (int i = 0; i < amount_of_commands; i++)
+  for (int i = 0; i < amount_of_lines; i++)
     {
       fscanf (file, "%s", str);
 
@@ -152,12 +136,12 @@ char *createBinary (FILE *file, size_t amount_of_commands, size_t* total_bytes, 
         {
           printf("Bad syntax! Command '%s' doesn't exist. \n", str); exit(-1);
         }
-          memset (arg, 0, 63);
-          memset (str, 0, 4);
+          memset (arg, 0, MAX_ARG_LENGTH - 1);
+          memset (str, 0, MAX_COMMAND_NAME_LENGTH - 1);
     }
     *total_bytes = array - array_copy;
     rewind(file);
-    return processJumps (file, amount_of_commands, marks, array_copy);
+    return processJumps (file, amount_of_lines, marks, array_copy);
 }
 
 int main (int argc, char *const argv[])
@@ -185,13 +169,13 @@ int main (int argc, char *const argv[])
   File input{};
   input = loadFile (input_file);
 
-  size_t amount_of_commands = getAmountOfCommands (input.raw_data);
+  size_t amount_of_lines = getNumberOfLines (input.raw_data);
   size_t total_bytes = 0;
 
   FILE *src_file = fopen (input_file, "r");
-  Mark* marks = (Mark *) calloc (amount_of_commands, sizeof(Mark));
+  Mark* marks = (Mark *) calloc (amount_of_lines, sizeof(Mark));
 
-  char *binary = createBinary (src_file, amount_of_commands, &total_bytes, marks);
+  char *binary = createBinary (src_file, amount_of_lines, &total_bytes, marks);
   writeBinary (binary, output_file, total_bytes);
 
   fclose(src_file);
