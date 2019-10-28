@@ -75,7 +75,7 @@ DEF_CMD (PUSH, 	1,  	CMD_ALT (!isalpha(arg[0]) && arg[0]!='[', 	IMMED, 		1, 	Sta
                   	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	REG_IMMED, 	31, 	StackPush(stack, mem[registers[arg]])))
 
 DEF_CMD (POP, 	1, 	CMD_ALT (arg[1] == 'x', 			REG, 		2, 	registers[arg] = StackPop(stack, &status))
-                	CMD_ALT (arg[0] == '[' && arg[2] != 'x', 	MEM_IMMED, 	22, 	mem[arg] = StackPop(stack, &status))
+                	CMD_ALT (arg[0] == '[' && arg[2] != 'x', 	MEM_IMMED, 	22, 	mem[arg] = StackPop(stack, &satus))
                 	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	MEM_REG, 	32, 	mem[registers[arg]] = StackPop(stack, &status)))
 
 DEF_CMD (ADD, 	0, 	CMD_ALT (true, 					NO_ARG, 	3, 	StackPush(stack, StackPop(stack, &status) + StackPop(stack, &status))))
@@ -88,7 +88,7 @@ DEF_CMD (DIV,  	0, 	CMD_ALT (true, 					NO_ARG, 	6, 	StackPush(stack, StackPop(s
 
 DEF_CMD (OUT, 	0, 	CMD_ALT (true, 					NO_ARG, 	15, 	printf("%d\n", StackPop(stack, &status))))
 
-DEF_CMD (IN, 	0, 	CMD_ALT (true, 					NO_ARG, 	16, 	scanf("%d", value)))
+DEF_CMD (IN, 	0, 	CMD_ALT (true, 					NO_ARG, 	16, 	scanf("%d", arg); StackPush(stack, arg))
 
 DEF_CMD	(GSET, 	1, 	CMD_ALT (!isalpha(arg[0]), 			IMMED, 		19, 	graphics[arg] = StackPop(stack, &status))
                  	CMD_ALT (arg[1] == 'x', 			REG, 		23, 	graphics[registers[arg]] = StackPop(stack, &status)))
