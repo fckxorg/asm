@@ -7,8 +7,6 @@
 #IncludeRegexTransform: 
 
 /home/maxim/CLionProjects/asm/compiler/commands.h
-config.h
-/home/maxim/CLionProjects/asm/compiler/config.h
 
 /home/maxim/CLionProjects/asm/compiler/config.h
 
@@ -22,6 +20,8 @@ stdlib.h
 ctype.h
 -
 assert.h
+-
+map
 -
 string_funcs.h
 /home/maxim/CLionProjects/asm/compiler/string_funcs.h

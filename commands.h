@@ -1,8 +1,14 @@
 //
 // Created by maxim on 15.10.19.
 //
+enum Arg_types {
+    NO_ARG = 0,
+    IMMED  = 1,
+    REG  = 2,
+    MEM_IMMED  = 4,
+    MEM_REG  = 5
+};
 
-#include "config.h"
 
 #define CLEAR_CONSOLE printf("\e[1;1H\e[2J")
 
@@ -12,13 +18,13 @@
 
 #define CMD_ALT(condition, arg_type, opcode, code)\
 if(condition){\
-  *array = opcode;\
-  array++;\
+  *binary = opcode;\
+  binary++;\
   \
   switch(arg_type){\
     case IMMED:\
-      *((int *) array) = atoi(arg);\
-      array += sizeof (int);\
+      *((int *) binary) = atoi(arg);\
+      binary += sizeof (int);\
       break;\
       \
     case REG:\
@@ -27,8 +33,8 @@ if(condition){\
         {\
           if(strcmp(registers[reg], arg) == 0)\
             {\
-              *((int *) array) = reg;\
-              array+=sizeof(int);\
+              *((int *) binary) = reg;\
+              binary+=sizeof(int);\
               status = true;\
             }\
         }\
@@ -39,8 +45,8 @@ if(condition){\
         break;\
         \
     case MEM_IMMED:\
-      *((int *) array) = atoi(arg+1);\
-      array += sizeof (int);\
+      *((int *) binary) = atoi(arg+1);\
+      binary += sizeof (int);\
       break;\
       \
     case MEM_REG:\
@@ -50,8 +56,8 @@ if(condition){\
         {\
           if(strcmp(registers[reg], arg+1) == 0)\
             {\
-              *((int *) array) = reg;\
-              array+=sizeof(int);\
+              *((int *) binary) = reg;\
+              binary+=sizeof(int);\
               status = true;\
             }\
         }\
@@ -71,8 +77,8 @@ if(condition){\
 
 DEF_CMD (PUSH, 	1,  	CMD_ALT (!isalpha(arg[0]) && arg[0]!='[', 	IMMED, 		1, 	StackPush(stack, value))
                   	CMD_ALT (arg[1] == 'x', 			REG, 		11, 	StackPush(stack, registers[arg]))
-                  	CMD_ALT (arg[0]== '[' && arg[2]!='x', 		MEM_IMMED, 	21, 	StackPush(stack, mem[atoi(arg+1)]))
-                  	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	REG_IMMED, 	31, 	StackPush(stack, mem[registers[arg]])))
+                  	CMD_ALT (arg[0]== '[' && arg[2]!='x', 		MEM_IMMED, 	21, 	StackPush(stack, mem[arg]))
+                  	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	MEM_REG, 	31, 	StackPush(stack, mem[registers[arg]])))
 
 DEF_CMD (POP, 	1, 	CMD_ALT (arg[1] == 'x', 			REG, 		2, 	registers[arg] = StackPop(stack, &status))
                 	CMD_ALT (arg[0] == '[' && arg[2] != 'x', 	MEM_IMMED, 	22, 	mem[atoi(arg+1)] = StackPop(stack, &status))
@@ -104,6 +110,8 @@ DEF_CMD (GOUT, 	0, 	CMD_ALT (true, 					NO_ARG, 	20,	CLEAR_CONSOLE;
 
 DEF_CMD (SQRT, 	0, 	CMD_ALT (true, 					NO_ARG, 	24, 	StackPush(stack, sqrt(StackPop(stack, &status)))))
 
+DEF_CMD (RET,   0,	CMD_ALT (true,  				NO_ARG,		18,	array = array_start + StackPop(stack, &status)))
+
 
 //============================================
 //JUMPS
@@ -125,5 +133,3 @@ DEF_JUMP (JB, 		13, 	if(StackPop(stack, &status) < StackPop(stack, &status)){buf
 DEF_JUMP (JBE, 		14, 	if(StackPop(stack, &status) <= StackPop(stack, &status)){buffer = 0})
 
 DEF_JUMP (CALL, 	17, 	true)
-
-DEF_JUMP (RET, 		18, 	true)

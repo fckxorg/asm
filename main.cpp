@@ -3,20 +3,17 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <assert.h>
+#include <map>
 #include "string_funcs.h"
 #include "config.h"
 
-struct Mark{
-    size_t byte;
-    char name[MAX_MARK_NAME_LENGTH];
-};
-
 const char registers[N_REGISTERS][MAX_REGISTER_NAME_LENGTH] = {"ax", "bx", "cx", "dx"};
 
-char* forwardBuffer(char *buffer)
+char* parseArg(char *buffer, char* container)
 {
-  while(*buffer != ' ' && *buffer != '\n' && *buffer != '\0') buffer++;
-  buffer++;
+  size_t pos = 0;
+  sscanf (buffer, "%s%n", container, &pos);
+  buffer+=pos;
   return buffer;
 }
 
@@ -30,133 +27,107 @@ void writeBinary (const char *binary, const char *filename, size_t total_bytes)
   fclose (file);
 }
 
-char *processJumps (char* buffer, size_t amount_of_lines, Mark* marks, char* array){
+char *processJumps (char* buffer, size_t amount_of_lines, std::map<std::string, int> marks, char* binary){
   assert(buffer);
-  assert(array);
-  assert(marks);
+  assert(binary);
 
-  Mark* cur_mark = marks;
-  char *array_copy = array;
-  char str[MAX_COMMAND_NAME_LENGTH] = "";
+  char *binary_start = binary;
+  char cmd_name[MAX_COMMAND_NAME_LENGTH] = "";
   char arg[MAX_ARG_LENGTH] = "";
-  arg[MAX_ARG_LENGTH - 1]= '\0';
 
   for (int i = 0; i < amount_of_lines; i++)
     {
-      sscanf (buffer, "%s", str);
-      buffer = forwardBuffer (buffer);
+      buffer = parseArg(buffer, cmd_name);
 
 #define DEF_JUMP(cmd, opcode, code)\
-if(strcmp(str, #cmd) == 0)\
-{\
-  array++;\
-  sscanf(buffer, "%s", arg);\
-  buffer = forwardBuffer(buffer);\
-      for(int j = 0; j < N_REGISTERS; j++)\
-        {\
-          if(strcmp (marks[j].name, arg) == 0)\
-            {\
-              *((int*)array) = marks[j].byte;\
-              array+=sizeof(int);\
-              break;\
-            }\
-        }\
-}
+if(strcmp(cmd_name, #cmd) == 0)\
+  {\
+    binary++;\
+    buffer = parseArg(buffer, arg);\
+    *((int *) binary) = marks[arg];\
+    binary += sizeof (int);\
+    break;\
+  }
 
 #define DEF_CMD(cmd, n_args, decision_tree)\
-        if (strcmp (str, #cmd) == 0)\
-          {\
-            array++;\
-            if(n_args)\
-            {\
-              sscanf(buffer, "%s", arg);\
-              buffer = forwardBuffer(buffer);\
-              array+=sizeof(int);\
-            }\
-          }\
+if (strcmp (cmd_name, #cmd) == 0)\
+  {\
+    binary++;\
+    if(n_args)\
+    {\
+      buffer = parseArg(buffer, arg);\
+      binary+=sizeof(int);\
+    }\
+  }
 
 #include "commands.h"
 #undef DEF_CMD
 #undef DEF_JUMP
     }
 
-  return array_copy;
+  return binary_start;
 }
 
 
-char *createBinary (char *buffer, size_t amount_of_lines, size_t* total_bytes, Mark* marks)
+char *createBinary (char *buffer, size_t amount_of_lines, size_t* total_bytes)
 {
   assert(buffer);
   assert(total_bytes);
-  assert(marks);
 
-  char *buffer_copy = buffer;
-  char *array = (char *) calloc (amount_of_lines * BYTES_ARRAY_COEFFICIENT, sizeof (char));
+  std::map<std::string, int> marks;
+  char *binary = new char[amount_of_lines * BYTES_ARRAY_COEFFICIENT]();
 
-  Mark* cur_mark = marks;
+  char *binary_start = binary;
+  char *buffer_start = buffer;
 
-  char *array_copy = array;
-  char str[MAX_COMMAND_NAME_LENGTH] = "";
+  char cmd_name[MAX_COMMAND_NAME_LENGTH] = "";
   char arg[MAX_ARG_LENGTH] = "";
-  arg[MAX_ARG_LENGTH - 1]= '\0';
 
   bool status = false;
 
   for (int i = 0; i < amount_of_lines; i++)
     {
-      sscanf (buffer, "%s", str);
-      buffer = forwardBuffer (buffer);
-
-      if(str[0] == ':')
+      buffer = parseArg(buffer, cmd_name);
+      if(cmd_name[0] == ':')
         {
-          cur_mark->byte = array - array_copy;
-          memcpy (cur_mark->name, str+1, 64);
-          cur_mark++;
+          int position = binary - binary_start;
+          std::string mark_name;
+          mark_name.insert(0, cmd_name);
+          marks.insert(std::make_pair(mark_name, position));
           continue;
         }
 #define DEF_CMD(cmd, n_args, decision_tree)\
-        if (strcmp (str, #cmd) == 0)\
+        if (strcmp (cmd_name, #cmd) == 0)\
           {\
-            if(n_args)\
-            {\
-              sscanf (buffer, "%s", arg);\
-              buffer = forwardBuffer(buffer);\
-            }\
+            if(n_args) buffer = parseArg(buffer, arg);\
             decision_tree\
           }\
         else
 
 #define DEF_JUMP(cmd, opcode, code)\
-        if(strcmp(str, #cmd) == 0)\
+        if(strcmp(cmd_name, #cmd) == 0)\
         {\
-          *array = opcode;\
-          array++;\
-          if(strcmp(#cmd, "RET") != 0)\
-          {\
-            *((int *) array) = 0;\
-            array += sizeof (int);\
-          }\
-          sscanf (buffer, "%s", arg);\
-          buffer = forwardBuffer(buffer);\
+          *binary = opcode;\
+          binary++;\
+          *((int *) binary) = 0;\
+          binary += sizeof (int);\
+          buffer = parseArg(buffer, arg);\
         }\
         else
 
 #include "commands.h"
 #undef DEF_CMD
 #undef DEF_JUMP
-      if(strcmp (str, "") == 0)
-        {
-          continue;
-        }
+      if(strcmp (cmd_name, "") == 0) continue;
       else
         {
-          printf("Bad syntax! Command '%s' doesn't exist. \n", str); exit(-1);
+          printf("Bad syntax! Command '%s' doesn't exist. \n", cmd_name); exit(-1);
         }
-          memset (arg, 0, MAX_ARG_LENGTH - 1);
-          memset (str, 0, MAX_COMMAND_NAME_LENGTH - 1);
+        memset (arg, 0, MAX_ARG_LENGTH - 1);
+        memset (cmd_name, 0, MAX_COMMAND_NAME_LENGTH - 1);
     }
-    *total_bytes = array - array_copy;
-    return processJumps (buffer_copy, amount_of_lines, marks, array_copy);
+    *total_bytes = binary - binary_start;
+    return processJumps (buffer_start, amount_of_lines, marks, binary_start);
 }
 
 int main (int argc, char *const argv[])
@@ -187,9 +158,7 @@ int main (int argc, char *const argv[])
   size_t amount_of_lines = getNumberOfLines (input.raw_data);
   size_t total_bytes = 0;
 
-  Mark* marks = (Mark *) calloc (amount_of_lines, sizeof(Mark));
-
-  char *binary = createBinary (input.raw_data, amount_of_lines, &total_bytes, marks);
+  char *binary = createBinary (input.raw_data, amount_of_lines, &total_bytes);
   writeBinary (binary, output_file, total_bytes);
 
   free(binary);
