@@ -43,8 +43,7 @@ if(strcmp(cmd_name, #cmd) == 0)\
   {\
     binary++;\
     buffer = parseArg(buffer, arg);\
-    std::string mark_name;\
-    mark_name.insert(0, arg);\
+    std::string mark_name = arg;\
     *((int *) binary) = marks[mark_name];\
     binary += sizeof (int);\
     break;\
@@ -93,8 +92,7 @@ char *createBinary (char *buffer, size_t amount_of_lines, size_t* total_bytes)
       if(cmd_name[0] == ':')
         {
           int position = binary - binary_start;
-          std::string mark_name = "";
-          mark_name.insert(0, cmd_name + 1);
+          std::string mark_name = cmd_name;
           marks[mark_name] = position;
           continue;
         }

@@ -38,5 +38,13 @@ commands.h
 
 /home/maxim/CLionProjects/asm/compiler/string_funcs.h
 
+/home/maxim/CLionProjects/asm/compiler/switch_funcs.cpp
+map
+-
+switch_funcs.h
+/home/maxim/CLionProjects/asm/compiler/switch_funcs.h
+config.h
+/home/maxim/CLionProjects/asm/compiler/config.h
+
 /home/maxim/CLionProjects/asm/compiler/switch_funcs.h
 
