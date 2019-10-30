@@ -177,6 +177,33 @@ string_funcs.cpp.s:
 	$(MAKE) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/string_funcs.cpp.s
 .PHONY : string_funcs.cpp.s
 
+switch_funcs.o: switch_funcs.cpp.o
+
+.PHONY : switch_funcs.o
+
+# target to build an object file
+switch_funcs.cpp.o:
+	$(MAKE) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/switch_funcs.cpp.o
+.PHONY : switch_funcs.cpp.o
+
+switch_funcs.i: switch_funcs.cpp.i
+
+.PHONY : switch_funcs.i
+
+# target to preprocess a source file
+switch_funcs.cpp.i:
+	$(MAKE) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/switch_funcs.cpp.i
+.PHONY : switch_funcs.cpp.i
+
+switch_funcs.s: switch_funcs.cpp.s
+
+.PHONY : switch_funcs.s
+
+# target to generate assembly for a file
+switch_funcs.cpp.s:
+	$(MAKE) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/switch_funcs.cpp.s
+.PHONY : switch_funcs.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -192,6 +219,9 @@ help:
 	@echo "... string_funcs.o"
 	@echo "... string_funcs.i"
 	@echo "... string_funcs.s"
+	@echo "... switch_funcs.o"
+	@echo "... switch_funcs.i"
+	@echo "... switch_funcs.s"
 .PHONY : help
 
 

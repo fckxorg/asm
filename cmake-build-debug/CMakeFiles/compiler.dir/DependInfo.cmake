@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/maxim/CLionProjects/asm/compiler/main.cpp" "/home/maxim/CLionProjects/asm/compiler/cmake-build-debug/CMakeFiles/compiler.dir/main.cpp.o"
   "/home/maxim/CLionProjects/asm/compiler/string_funcs.cpp" "/home/maxim/CLionProjects/asm/compiler/cmake-build-debug/CMakeFiles/compiler.dir/string_funcs.cpp.o"
+  "/home/maxim/CLionProjects/asm/compiler/switch_funcs.cpp" "/home/maxim/CLionProjects/asm/compiler/cmake-build-debug/CMakeFiles/compiler.dir/switch_funcs.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

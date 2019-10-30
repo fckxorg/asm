@@ -3,11 +3,11 @@
 //
 
 #include "string_funcs.h"
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
 
 int writeFileFromBuffer (char *filepath, char *buffer, int file_size)
 {

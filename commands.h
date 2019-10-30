@@ -11,58 +11,7 @@
 #define SET_COLOR(color) printf("\u001b[%dm", color);
 
 #define CMD_ALT(condition, arg_type, opcode, code)\
-if(condition){\
-  *array = opcode;\
-  array++;\
-  \
-  switch(arg_type){\
-    case IMMED:\
-      *((int *) array) = atoi(arg);\
-      array += sizeof (int);\
-      break;\
-      \
-    case REG:\
-      status = false;\
-      for(int reg = 0 ; reg < N_REGISTERS; reg++)\
-        {\
-          if(strcmp(registers[reg], arg) == 0)\
-            {\
-              *((int *) array) = reg;\
-              array+=sizeof(int);\
-              status = true;\
-            }\
-        }\
-        if(!status)\
-          {\
-            printf("Bad parameter! Register '%s' doesn't exist! \n", arg); exit(-1);\
-          }\
-        break;\
-        \
-    case MEM_IMMED:\
-      *((int *) array) = atoi(arg+1);\
-      array += sizeof (int);\
-      break;\
-      \
-    case MEM_REG:\
-      status = false;\
-      *(arg + MAX_REGISTER_NAME_LENGTH) = '\0';\
-      for(int reg =0 ; reg < N_REGISTERS; reg++)\
-        {\
-          if(strcmp(registers[reg], arg+1) == 0)\
-            {\
-              *((int *) array) = reg;\
-              array+=sizeof(int);\
-              status = true;\
-            }\
-        }\
-        if(!status)\
-          {\
-            printf("Bad parameter! Register '%s' doesn't exist! \n", arg+1); exit(-1);\
-          }\
-    default:\
-      break;\
-  }\
-}
+binary = decisionTree(condition, arg_type, opcode, binary, arg);
 
 //============================================
 //COMMANDS
@@ -72,7 +21,7 @@ if(condition){\
 DEF_CMD (PUSH, 	1,  	CMD_ALT (!isalpha(arg[0]) && arg[0]!='[', 	IMMED, 		1, 	StackPush(stack, arg))
                   	CMD_ALT (arg[1] == 'x', 			REG, 		11, 	StackPush(stack, registers[arg]))
                   	CMD_ALT (arg[0]== '[' && arg[2]!='x', 		MEM_IMMED, 	21, 	StackPush(stack, mem[arg]))
-                  	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	REG_IMMED, 	31, 	StackPush(stack, mem[registers[arg]])))
+                  	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	MEM_REG, 	31, 	StackPush(stack, mem[registers[arg]])))
 
 DEF_CMD (POP, 	1, 	CMD_ALT (arg[1] == 'x', 			REG, 		2, 	registers[arg] = StackPop(stack, &status))
                 	CMD_ALT (arg[0] == '[' && arg[2] != 'x', 	MEM_IMMED, 	22, 	mem[arg] = StackPop(stack, &satus))
@@ -104,6 +53,8 @@ DEF_CMD (GOUT, 	0, 	CMD_ALT (true, 					NO_ARG, 	20,	CLEAR_CONSOLE;
 
 DEF_CMD (SQRT, 	0, 	CMD_ALT (true, 					NO_ARG, 	24, 	StackPush(stack, sqrt(StackPop(stack, &status)))))
 
+DEF_CMD (RET,   0,	CMD_ALT (true,  				NO_ARG,		18,	array = array_start + StackPop(stack, &status)))
+
 
 //============================================
 //JUMPS
@@ -112,18 +63,16 @@ DEF_CMD (SQRT, 	0, 	CMD_ALT (true, 					NO_ARG, 	24, 	StackPush(stack, sqrt(Stac
 
 DEF_JUMP (JUMP, 	7, 	true)
 
-DEF_JUMP (JE, 		8, 	StackPop(stack, &status) == Stack(stack, &status)
+DEF_JUMP (JE, 		8, 	StackPop(stack, &status) == Stack(stack, &status))
 
 DEF_JUMP (JNE, 		9, 	StackPop(stack, &status) != Stack(stack, &status))
 
-DEF_JUMP (JA, 		10, 	StackPop(stack, &status) > StackPop(stack, &status))
+DEF_JUMP (JA, 		10, StackPop(stack, &status) > StackPop(stack, &status))
 
-DEF_JUMP (JAE, 		12, 	StackPop(stack, &status) >= StackPop(stack, &status))
+DEF_JUMP (JAE, 		12, StackPop(stack, &status) >= StackPop(stack, &status))
 
-DEF_JUMP (JB, 		13, 	StackPop(stack, &status) < StackPop(stack, &status))
+DEF_JUMP (JB, 		13, StackPop(stack, &status) < StackPop(stack, &status))
 
-DEF_JUMP (JBE, 		14, 	StackPop(stack, &status) <= StackPop(stack, &status))
+DEF_JUMP (JBE, 		14, StackPop(stack, &status) <= StackPop(stack, &status))
 
-DEF_JUMP (CALL, 	17, 	true)
-
-DEF_JUMP (RET, 		18, 	true)
+DEF_JUMP (CALL, 	17, true)

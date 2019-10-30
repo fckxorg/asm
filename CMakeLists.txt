@@ -3,4 +3,4 @@ project(compiler)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(compiler main.cpp string_funcs.cpp string_funcs.h commands.h)
+add_executable(compiler main.cpp string_funcs.cpp string_funcs.h commands.h switch_funcs.cpp switch_funcs.h)

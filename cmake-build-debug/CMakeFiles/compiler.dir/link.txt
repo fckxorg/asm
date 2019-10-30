@@ -1,1 +1,1 @@
-/bin/g++  -g   CMakeFiles/compiler.dir/main.cpp.o CMakeFiles/compiler.dir/string_funcs.cpp.o  -o compiler 
+/bin/g++  -g   CMakeFiles/compiler.dir/main.cpp.o CMakeFiles/compiler.dir/string_funcs.cpp.o CMakeFiles/compiler.dir/switch_funcs.cpp.o  -o compiler 
