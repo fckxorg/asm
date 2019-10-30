@@ -98,6 +98,9 @@ char *createBinary (char *buffer, size_t amount_of_lines, size_t* total_bytes)
           marks[mark_name] = position;
           continue;
         }
+        
+#define CMD_ALT(condition, arg_type, opcode, code)\
+binary = decisionTree(condition, arg_type, opcode, binary, arg);
 
 #define DEF_CMD(cmd, n_args, decision_tree)\
         if (strcmp (cmd_name, #cmd) == 0)\

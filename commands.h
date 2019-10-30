@@ -10,8 +10,6 @@
 
 #define SET_COLOR(color) printf("\u001b[%dm", color);
 
-#define CMD_ALT(condition, arg_type, opcode, code)\
-binary = decisionTree(condition, arg_type, opcode, binary, arg);
 
 //============================================
 //COMMANDS
