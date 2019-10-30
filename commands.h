@@ -9,7 +9,6 @@ enum Arg_types {
     MEM_REG  = 5
 };
 
-
 #define CLEAR_CONSOLE printf("\e[1;1H\e[2J")
 
 #define RESET_COLOR printf("\u001b[0m")
@@ -17,58 +16,7 @@ enum Arg_types {
 #define SET_COLOR(color) printf("\u001b[%dm", color);
 
 #define CMD_ALT(condition, arg_type, opcode, code)\
-if(condition){\
-  *binary = opcode;\
-  binary++;\
-  \
-  switch(arg_type){\
-    case IMMED:\
-      *((int *) binary) = atoi(arg);\
-      binary += sizeof (int);\
-      break;\
-      \
-    case REG:\
-      status = false;\
-      for(int reg = 0 ; reg < N_REGISTERS; reg++)\
-        {\
-          if(strcmp(registers[reg], arg) == 0)\
-            {\
-              *((int *) binary) = reg;\
-              binary+=sizeof(int);\
-              status = true;\
-            }\
-        }\
-        if(!status)\
-          {\
-            printf("Bad parameter! Register '%s' doesn't exist! \n", arg); exit(-1);\
-          }\
-        break;\
-        \
-    case MEM_IMMED:\
-      *((int *) binary) = atoi(arg+1);\
-      binary += sizeof (int);\
-      break;\
-      \
-    case MEM_REG:\
-      status = false;\
-      *(arg + MAX_REGISTER_NAME_LENGTH) = '\0';\
-      for(int reg =0 ; reg < N_REGISTERS; reg++)\
-        {\
-          if(strcmp(registers[reg], arg+1) == 0)\
-            {\
-              *((int *) binary) = reg;\
-              binary+=sizeof(int);\
-              status = true;\
-            }\
-        }\
-        if(!status)\
-          {\
-            printf("Bad parameter! Register '%s' doesn't exist! \n", arg+1); exit(-1);\
-          }\
-    default:\
-      break;\
-  }\
-}
+decisionTree(condition, arg_type, opcode, binary, arg);
 
 //============================================
 //COMMANDS
@@ -120,16 +68,16 @@ DEF_CMD (RET,   0,	CMD_ALT (true,  				NO_ARG,		18,	array = array_start + StackP
 
 DEF_JUMP (JUMP, 	7, 	true)
 
-DEF_JUMP (JE, 		8, 	if(StackPop(stack, &status) == Stack(stack, &status)){buffer = 0})
+DEF_JUMP (JE, 		8, 	StackPop(stack, &status) == Stack(stack, &status))
 
-DEF_JUMP (JNE, 		9, 	if(StackPop(stack, &status) != Stack(stack, &status)){buffer = 0})
+DEF_JUMP (JNE, 		9, 	StackPop(stack, &status) != Stack(stack, &status))
 
-DEF_JUMP (JA, 		10, 	if(StackPop(stack, &status) > StackPop(stack, &status)){buffer = 0})
+DEF_JUMP (JA, 		10, StackPop(stack, &status) > StackPop(stack, &status))
 
-DEF_JUMP (JAE, 		12, 	if(StackPop(stack, &status) >= StackPop(stack, &status)){buffer = 0})
+DEF_JUMP (JAE, 		12, StackPop(stack, &status) >= StackPop(stack, &status))
 
-DEF_JUMP (JB, 		13, 	if(StackPop(stack, &status) < StackPop(stack, &status)){buffer = 0})
+DEF_JUMP (JB, 		13, StackPop(stack, &status) < StackPop(stack, &status))
 
-DEF_JUMP (JBE, 		14, 	if(StackPop(stack, &status) <= StackPop(stack, &status)){buffer = 0})
+DEF_JUMP (JBE, 		14, StackPop(stack, &status) <= StackPop(stack, &status))
 
-DEF_JUMP (CALL, 	17, 	true)
+DEF_JUMP (CALL, 	17, true)

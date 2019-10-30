@@ -13,13 +13,13 @@
 /home/maxim/CLionProjects/asm/compiler/main.cpp
 cstring
 -
-stdio.h
+cstdio
 -
-stdlib.h
+cstdlib
 -
-ctype.h
+cctype
 -
-assert.h
+cassert
 -
 map
 -

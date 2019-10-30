@@ -1,19 +1,17 @@
 #include <cstring>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
+#include <cassert>
 #include <map>
 #include "string_funcs.h"
 #include "config.h"
-
-const char registers[N_REGISTERS][MAX_REGISTER_NAME_LENGTH] = {"ax", "bx", "cx", "dx"};
 
 char* parseArg(char *buffer, char* container)
 {
   size_t pos = 0;
   sscanf (buffer, "%s%n", container, &pos);
-  buffer+=pos;
+  buffer += pos;
   return buffer;
 }
 
@@ -35,7 +33,7 @@ char *processJumps (char* buffer, size_t amount_of_lines, std::map<std::string, 
   char cmd_name[MAX_COMMAND_NAME_LENGTH] = "";
   char arg[MAX_ARG_LENGTH] = "";
 
-  for (int i = 0; i < amount_of_lines; i++)
+  for (size_t line = 0; line < amount_of_lines; line++)
     {
       buffer = parseArg(buffer, cmd_name);
 
@@ -44,7 +42,9 @@ if(strcmp(cmd_name, #cmd) == 0)\
   {\
     binary++;\
     buffer = parseArg(buffer, arg);\
-    *((int *) binary) = marks[arg];\
+    std::string mark_name;\
+    mark_name.insert(0, arg);\
+    *((int *) binary) = marks[mark_name];\
     binary += sizeof (int);\
     break;\
   }
@@ -85,17 +85,19 @@ char *createBinary (char *buffer, size_t amount_of_lines, size_t* total_bytes)
 
   bool status = false;
 
-  for (int i = 0; i < amount_of_lines; i++)
+  for (size_t line = 0; line < amount_of_lines; line++)
     {
       buffer = parseArg(buffer, cmd_name);
+
       if(cmd_name[0] == ':')
         {
           int position = binary - binary_start;
-          std::string mark_name;
-          mark_name.insert(0, cmd_name);
-          marks.insert(std::make_pair(mark_name, position));
+          std::string mark_name = "";
+          mark_name.insert(0, cmd_name + 1);
+          marks[mark_name] = position;
           continue;
         }
+
 #define DEF_CMD(cmd, n_args, decision_tree)\
         if (strcmp (cmd_name, #cmd) == 0)\
           {\
@@ -123,28 +125,25 @@ char *createBinary (char *buffer, size_t amount_of_lines, size_t* total_bytes)
         {
           printf("Bad syntax! Command '%s' doesn't exist. \n", cmd_name); exit(-1);
         }
+
         memset (arg, 0, MAX_ARG_LENGTH - 1);
         memset (cmd_name, 0, MAX_COMMAND_NAME_LENGTH - 1);
     }
+
     *total_bytes = binary - binary_start;
+
     return processJumps (buffer_start, amount_of_lines, marks, binary_start);
 }
 
 int main (int argc, char *const argv[])
 {
-  char *input_file = 0;
-  char *output_file = 0;
+  char *input_file = nullptr;
+  char *output_file = nullptr;
 
   if (argc == 5)
     {
-      if (strcmp ("-i", argv[1]) == 0)
-        {
-          input_file = argv[2];
-        }
-      if (strcmp ("-o", argv[3]) == 0)
-        {
-          output_file = argv[4];
-        }
+      if (strcmp ("-i", argv[1]) == 0) input_file = argv[2];
+      if (strcmp ("-o", argv[3]) == 0) output_file = argv[4];
     }
   else
     {
@@ -161,7 +160,7 @@ int main (int argc, char *const argv[])
   char *binary = createBinary (input.raw_data, amount_of_lines, &total_bytes);
   writeBinary (binary, output_file, total_bytes);
 
-  free(binary);
+  delete binary;
   free(input.raw_data);
   free(input.data);
   return 0;
