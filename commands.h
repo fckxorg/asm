@@ -1,13 +1,8 @@
 //
 // Created by maxim on 15.10.19.
 //
-enum Arg_types {
-    NO_ARG = 0,
-    IMMED  = 1,
-    REG  = 2,
-    MEM_IMMED  = 4,
-    MEM_REG  = 5
-};
+
+#include "config.h"
 
 #define CLEAR_CONSOLE printf("\e[1;1H\e[2J")
 
@@ -16,7 +11,7 @@ enum Arg_types {
 #define SET_COLOR(color) printf("\u001b[%dm", color);
 
 #define CMD_ALT(condition, arg_type, opcode, code)\
-decisionTree(condition, arg_type, opcode, binary, arg);
+binary = decisionTree(condition, arg_type, opcode, binary, arg);
 
 //============================================
 //COMMANDS

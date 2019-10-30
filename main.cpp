@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cassert>
 #include <map>
+#include "switch_funcs.h"
 #include "string_funcs.h"
 #include "config.h"
 
@@ -29,7 +30,7 @@ char *processJumps (char* buffer, size_t amount_of_lines, std::map<std::string, 
   assert(buffer);
   assert(binary);
 
-  char *binary_start = binary;
+  char* binary_start = binary;
   char cmd_name[MAX_COMMAND_NAME_LENGTH] = "";
   char arg[MAX_ARG_LENGTH] = "";
 

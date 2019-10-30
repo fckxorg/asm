@@ -5,7 +5,12 @@ CMakeFiles/compiler.dir/main.cpp.o: ../commands.h
 CMakeFiles/compiler.dir/main.cpp.o: ../config.h
 CMakeFiles/compiler.dir/main.cpp.o: ../main.cpp
 CMakeFiles/compiler.dir/main.cpp.o: ../string_funcs.h
+CMakeFiles/compiler.dir/main.cpp.o: ../switch_funcs.h
 
 CMakeFiles/compiler.dir/string_funcs.cpp.o: ../string_funcs.cpp
 CMakeFiles/compiler.dir/string_funcs.cpp.o: ../string_funcs.h
+
+CMakeFiles/compiler.dir/switch_funcs.cpp.o: ../config.h
+CMakeFiles/compiler.dir/switch_funcs.cpp.o: ../switch_funcs.cpp
+CMakeFiles/compiler.dir/switch_funcs.cpp.o: ../switch_funcs.h
 

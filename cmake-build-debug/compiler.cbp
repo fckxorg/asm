@@ -94,6 +94,12 @@
 		<Unit filename="/home/maxim/CLionProjects/asm/compiler/string_funcs.h">
 			<Option target="compiler"/>
 		</Unit>
+		<Unit filename="/home/maxim/CLionProjects/asm/compiler/switch_funcs.cpp">
+			<Option target="compiler"/>
+		</Unit>
+		<Unit filename="/home/maxim/CLionProjects/asm/compiler/switch_funcs.h">
+			<Option target="compiler"/>
+		</Unit>
 		<Unit filename="/home/maxim/CLionProjects/asm/compiler/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

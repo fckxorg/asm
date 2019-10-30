@@ -18,5 +18,10 @@ const int GRAPHICS_LINE_SIZE = 16;
 
 const int BYTES_ARRAY_COEFFICIENT = 5;
 
-//const char registers[N_REGISTERS][MAX_REGISTER_NAME_LENGTH] = {"ax", "bx", "cx", "dx"};
-const std::map<char, int> registers = {{'a', 0}, {'b',1}, {'c', 2}, {'d', 3}};
+enum Arg_types {
+    NO_ARG = 0,
+    IMMED  = 1,
+    REG  = 2,
+    MEM_IMMED  = 4,
+    MEM_REG  = 5
+};
