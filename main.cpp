@@ -92,7 +92,7 @@ char *createBinary (char *buffer, size_t amount_of_lines, size_t* total_bytes)
       if(cmd_name[0] == ':')
         {
           int position = binary - binary_start;
-          std::string mark_name = cmd_name;
+          std::string mark_name = cmd_name+1;
           marks[mark_name] = position;
           continue;
         }

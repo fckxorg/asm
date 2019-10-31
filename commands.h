@@ -16,7 +16,7 @@
 //============================================
 //	name	n_args	overload	condition			arg_type	opcode  code
 
-DEF_CMD (PUSH, 	1,  	CMD_ALT (!isalpha(arg[0]) && arg[0]!='[', 	IMMED, 		1, 	StackPush(stack, value))
+DEF_CMD (PUSH, 	1,  	CMD_ALT (!isalpha(arg[0]) && arg[0]!='[', 	IMMED, 		1, 	StackPush(stack, arg))
                   	CMD_ALT (arg[1] == 'x', 			REG, 		11, 	StackPush(stack, registers[arg]))
                   	CMD_ALT (arg[0]== '[' && arg[2]!='x', 		MEM_IMMED, 	21, 	StackPush(stack, mem[arg]))
                   	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	MEM_REG, 	31, 	StackPush(stack, mem[registers[arg]])))
