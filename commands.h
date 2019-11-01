@@ -23,6 +23,15 @@
 
 #define PRINT printf("%d\n", POP)
 
+#define REGISTER registers[arg]
+
+#define MEM_ACCESS_IMMED mem[arg]
+
+#define MEM_ACCESS_REGISTER mem[REGISTER]
+
+#define GRAPHICS_ARG graphics[arg]
+
+#define GRAPHICS_REG graphics[reg]
 
 //============================================
 //COMMANDS
@@ -30,13 +39,13 @@
 //	name	n_args	overload	condition			arg_type	opcode  code
 
 DEF_CMD (PUSH, 	1,  	CMD_ALT (!isalpha(arg[0]) && arg[0]!='[', 	IMMED, 		1, 	PUSH(arg))
-                  	CMD_ALT (arg[1] == 'x', 			REG, 		11, 	PUSH(registers[arg]))
-                  	CMD_ALT (arg[0]== '[' && arg[2]!='x', 		MEM_IMMED, 	21, 	PUSH(mem[arg]))
-                  	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	MEM_REG, 	31, 	PUSH(mem[registers[arg]])))
+                  	CMD_ALT (arg[1] == 'x', 			REG, 		11, 	PUSH(REGISTER))
+                  	CMD_ALT (arg[0]== '[' && arg[2]!='x', 		MEM_IMMED, 	21, 	PUSH(MEM_ACCESS_IMMED))
+                  	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	MEM_REG, 	31, 	PUSH(MEM_ACCESS_REGISTER)))
 
-DEF_CMD (POP, 	1, 	CMD_ALT (arg[1] == 'x', 			REG, 		2, 	registers[arg] = POP)
-                	CMD_ALT (arg[0] == '[' && arg[2] != 'x', 	MEM_IMMED, 	22, 	mem[atoi(arg+1)] = POP)
-                	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	MEM_REG, 	32, 	mem[registers[arg]] = POP))
+DEF_CMD (POP, 	1, 	CMD_ALT (arg[1] == 'x', 			REG, 		2, 	REGISTER = POP)
+                	CMD_ALT (arg[0] == '[' && arg[2] != 'x', 	MEM_IMMED, 	22, 	MEM_ACCESS_IMMED = POP)
+                	CMD_ALT (arg[0] == '[' && arg[2] == 'x', 	MEM_REG, 	32, 	MEM_ACCESS_REGISTER = POP))
 
 DEF_CMD (ADD, 	0, 	CMD_ALT (true, 					NO_ARG, 	3, 	arg = POP + POP; PUSH(arg)))
 
@@ -50,13 +59,13 @@ DEF_CMD (OUT, 	0, 	CMD_ALT (true, 					NO_ARG, 	15, 	PRINT))
 
 DEF_CMD (IN, 	0, 	CMD_ALT (true, 					NO_ARG, 	16, 	READ; PUSH(arg)))
 
-DEF_CMD	(GSET, 	1, 	CMD_ALT (!isalpha(arg[0]), 			IMMED, 		19, 	graphics[arg] = POP)
-                 	CMD_ALT (arg[1] == 'x', 			REG, 		23, 	graphics[registers[arg]] = POP))
+DEF_CMD	(GSET, 	1, 	CMD_ALT (!isalpha(arg[0]), 			IMMED, 		19, 	GRAPHICS_ARG = POP)
+                 	CMD_ALT (arg[1] == 'x', 			REG, 		23, 	GRAPHICS_REG = POP))
 
 DEF_CMD (GOUT, 	0, 	CMD_ALT (true, 					NO_ARG, 	20,	CLEAR_CONSOLE;
 												    	for(int i = 0; i < GRAPHICS_BUFFER_LENGTH`; i++){
 														if(i % GRAPHICS_LINE_LENGTH == 0) printf("\n");
-														SET_COLOR(graphics[i]);
+														SET_COLOR(GRAPHICS_ARG);
 														printf(" ");
 														RESET_COLOR;
 												      	} 
